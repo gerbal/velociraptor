@@ -31,8 +31,12 @@ echo ".github" >> .dockerignore
 echo "Authenticating with google..."
 docker login -u _json_key --password-stdin https://eu.gcr.io < $key
 
-echo "Building image..."
-docker build . -t $image
+# check if image already built (i.e. from another action)
+if [[ "$(docker images -q $image 2> /dev/null)" == "" ]]; then
+  echo "Building image..."
+  docker build . -t $image
+fi
+
 
 echo "Tagging image..."
 branch=$(echo "$GITHUB_REF" | awk -F '/' '{print $NF}')
